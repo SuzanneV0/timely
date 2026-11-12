@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timely</title>
+  <meta name="description" content="Time tracking and hourly reporting for freelancers.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="icons/icon.svg" alt="" width="28" height="28">
+      <span>Timely</span>
+    </div>
+    <label class="company-switch">
+      <span>Company</span>
+      <select id="companySelect" aria-label="Active company"></select>
+    </label>
+    <div class="clock" id="clock" title="Current Eastern Time"></div>
+  </header>
+
+  <main>
+    <section class="card timer-card" aria-label="Timer">
+      <div class="timer-top">
+        <div>
+          <div class="timer-display" id="timerDisplay" aria-live="off">0:00:00</div>
+          <div class="timer-status" id="timerStatus">Ready</div>
+        </div>
+        <div class="timer-buttons">
+          <button id="startBtn" class="btn primary">Start</button>
+          <button id="pauseBtn" class="btn">Pause</button>
+          <button id="stopBtn" class="btn">Stop &amp; save</button>
+          <button id="resetBtn" class="btn ghost">Reset</button>
+        </div>
+      </div>
+      <div class="timer-fields">
+        <label class="field grow">
+          <span>Task</span>
+          <input id="timerTask" type="text" placeholder="What are you working on?" autocomplete="off">
+        </label>
+        <label class="field">
+          <span>Category</span>
+          <select id="timerCategory"></select>
+        </label>
+        <label class="field full">
+          <span>Notes / comments <em>(optional)</em></span>
+          <textarea id="timerNotes" rows="2" placeholder="Anything worth adding to the report"></textarea>
+        </label>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Time log">
+      <div class="log-head">
+        <h2>Time log <span id="logCompany" class="muted"></span></h2>
+        <div class="log-actions">
+          <button id="addEntryBtn" class="btn">+ Add entry manually</button>
+          <button id="exportBtn" class="btn primary">Export to Excel</button>
+        </div>
+      </div>
+      <div class="filters">
+        <label class="field">
+          <span>Period</span>
+          <select id="rangeSelect">
+            <option value="today">Today</option>
+            <option value="week" selected>This week</option>
+            <option value="lastWeek">Last week</option>
+            <option value="month">This month</option>
+            <option value="lastMonth">Last month</option>
+            <option value="all">All time</option>
+            <option value="custom">Custom range…</option>
+          </select>
+        </label>
+        <label class="field custom-range" hidden>
+          <span>From</span>
+          <input id="fromDate" type="date">
+        </label>
+        <label class="field custom-range" hidden>
+          <span>To</span>
+          <input id="toDate" type="date">
+        </label>
+        <div class="total" id="rangeTotal"></div>
+      </div>
+      <div id="entries"></div>
+    </section>
+
+    <footer class="foot">
+      All times are recorded in US Eastern Time. Your data is stored on this device only.
+      <button id="backupBtn" class="link">Back up data</button> ·
+      <button id="restoreBtn" class="link">Restore from backup</button>
+      <input id="restoreFile" type="file" accept="application/json,.json" hidden>
+    </footer>
+  </main>
+
+  <!-- Add / edit entry -->
+  <dialog id="entryDlg">
+    <form method="dialog" id="entryForm">
+      <h3 id="entryDlgTitle">Add entry</h3>
+      <label class="field">
+        <span>Task</span>
+        <input id="eTask" type="text" required placeholder="What did you complete?" autocomplete="off">
+      </label>
+      <div class="row">
+        <label class="field grow">
+          <span>Company</span>
+          <select id="eCompany"></select>
+        </label>
+        <label class="field grow">
+          <span>Category</span>
+          <select id="eCategory"></select>
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span>Date (ET)</span>
+          <input id="eDate" type="date" required>
+        </label>
+        <label class="field grow">
+          <span>Time started (ET)</span>
+          <input id="eTime" type="time" required>
+        </label>
+        <label class="field grow">
+          <span>Duration</span>
+          <input id="eDuration" type="text" required placeholder="1:30 or 1.5" autocomplete="off">
+        </label>
+      </div>
+      <p class="hint">Duration accepts <code>h:mm</code>, <code>h:mm:ss</code>, decimal hours (<code>1.5</code>) or <code>1h 30m</code>.</p>
+      <label class="field">
+        <span>Notes / comments <em>(optional)</em></span>
+        <textarea id="eNotes" rows="3"></textarea>
+      </label>
+      <p class="error" id="eError" hidden></p>
+      <div class="dlg-actions">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Manage companies / categories -->
+  <dialog id="listDlg">
+    <form method="dialog">
+      <h3 id="listDlgTitle"></h3>
+      <div id="listItems" class="list-items"></div>
+      <div class="row add-row">
+        <input id="listNewName" type="text" autocomplete="off">
+        <button type="button" id="listAddBtn" class="btn">Add</button>
+      </div>
+      <div class="dlg-actions">
+        <button type="submit" class="btn primary">Done</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Export -->
+  <dialog id="exportDlg">
+    <form method="dialog" id="exportForm">
+      <h3>Export to Excel</h3>
+      <p id="exportSummary" class="hint"></p>
+      <label class="radio"><input type="radio" name="scope" value="current" checked> <span id="exportCurrentLabel"></span></label>
+      <label class="radio"><input type="radio" name="scope" value="all"> <span>All companies (one sheet per company)</span></label>
+      <div class="dlg-actions">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary">Download .xlsx</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script src="xlsx.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
