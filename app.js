@@ -4,7 +4,10 @@
 
   const TZ = 'America/New_York';
   const STORAGE_KEY = 'timely.v1';
-  const COLORS = ['#0f766e', '#2563eb', '#c2410c', '#7c3aed', '#be185d', '#4d7c0f', '#b45309', '#0369a1'];
+  // Dusty Lavender, Ghostly Blue, Pumpkin Orange, Antique Pink, Butter Yellow, Fog
+  const COLORS = ['#A88BC1', '#91B7C5', '#FDB17A', '#C49AA5', '#F4D48D', '#B6B0B7'];
+  // Default category colours from earlier versions, moved onto the current palette.
+  const OLD_COLORS = ['#0f766e', '#2563eb', '#c2410c', '#7c3aed', '#be185d', '#4d7c0f', '#b45309', '#0369a1'];
 
   const $ = (sel) => document.querySelector(sel);
   const pad = (n) => String(n).padStart(2, '0');
@@ -91,6 +94,10 @@
     const d = defaultState();
     if (!s || !Array.isArray(s.companies) || !s.companies.length) return d;
     s.categories = Array.isArray(s.categories) ? s.categories : [];
+    s.categories.forEach((c) => {
+      const i = OLD_COLORS.indexOf(String(c.color).toLowerCase());
+      if (i >= 0) c.color = COLORS[i % COLORS.length];
+    });
     s.entries = Array.isArray(s.entries) ? s.entries : [];
     s.timer = Object.assign(d.timer, s.timer || {});
     if (!s.companies.some((c) => c.id === s.activeCompanyId)) s.activeCompanyId = s.companies[0].id;

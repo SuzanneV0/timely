@@ -1,5 +1,5 @@
 /* Offline support: serve from the network when available, fall back to the cached copy. */
-const CACHE = 'timely-v1';
+const CACHE = 'timely-v2';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'xlsx.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

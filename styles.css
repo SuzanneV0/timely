@@ -1,31 +1,45 @@
 :root {
-  --bg: #f4f5f4;
-  --card: #ffffff;
-  --text: #17201f;
-  --muted: #64706e;
-  --line: #e1e5e4;
-  --accent: #0f766e;
-  --accent-strong: #0b5c56;
-  --accent-soft: #e3f2f0;
-  --danger: #b42318;
-  --warn: #b45309;
-  --field: #ffffff;
-  --shadow: 0 1px 2px rgba(16, 24, 23, .06), 0 4px 16px rgba(16, 24, 23, .05);
+  /* Palette */
+  --soft-black: #19171C;
+  --lavender: #A88BC1;
+  --antique-pink: #C49AA5;
+  --ghostly-blue: #91B7C5;
+  --fog: #B6B0B7;
+  --bone: #E6DDCE;
+  --butter: #F4D48D;
+  --pumpkin: #FDB17A;
+
+  --bg: var(--bone);
+  --card: #F6F1EA;
+  --field: #FFFDF9;
+  --text: var(--soft-black);
+  --muted: #5C5661;
+  --line: #D6CDC0;
+  --field-line: var(--fog);
+  --accent: var(--lavender);
+  --accent-hover: #9A7BB5;
+  --accent-text: #6A4B86;
+  --accent-soft: #EAE0F0;
+  --on-accent: var(--soft-black);
+  --danger: #964058;
+  --running: var(--ghostly-blue);
+  --paused: var(--butter);
+  --shadow: 0 1px 2px rgba(25, 23, 28, .06), 0 4px 16px rgba(25, 23, 28, .06);
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #101514;
-    --card: #1a2120;
-    --text: #e8eeed;
-    --muted: #93a09e;
-    --line: #2b3534;
-    --accent: #2bb3a6;
-    --accent-strong: #5fd0c5;
-    --accent-soft: #17302d;
-    --danger: #f97066;
-    --warn: #f0a94b;
-    --field: #141a19;
+    --bg: var(--soft-black);
+    --card: #232027;
+    --field: #1D1B21;
+    --text: var(--bone);
+    --muted: var(--fog);
+    --line: #36313C;
+    --field-line: #4A4450;
+    --accent-hover: #B9A0CE;
+    --accent-text: var(--lavender);
+    --accent-soft: #342B3D;
+    --danger: var(--antique-pink);
     --shadow: none;
   }
 }
@@ -69,14 +83,14 @@ input, select, textarea, button { font: inherit; color: inherit; }
 input[type="text"], input[type="date"], input[type="time"], select, textarea {
   width: 100%;
   background: var(--field);
-  border: 1px solid var(--line);
+  border: 1px solid var(--field-line);
   border-radius: 8px;
   padding: 8px 10px;
   min-height: 38px;
 }
 textarea { resize: vertical; }
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
-  outline: 2px solid var(--accent); outline-offset: 1px;
+  outline: 2px solid var(--accent-text); outline-offset: 1px;
 }
 .field { display: grid; gap: 5px; min-width: 0; }
 .field > span { font-size: 12.5px; font-weight: 600; color: var(--muted); }
@@ -95,13 +109,14 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 }
 .btn:hover:not(:disabled) { border-color: var(--accent); }
 .btn:disabled { opacity: .45; cursor: default; }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn.primary:hover:not(:disabled) { background: var(--accent-strong); border-color: var(--accent-strong); }
-@media (prefers-color-scheme: dark) { .btn.primary { color: #06201d; } }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+#stopBtn:not(:disabled) { background: var(--pumpkin); border-color: var(--pumpkin); color: var(--soft-black); }
+#stopBtn:not(:disabled):hover { filter: brightness(.95); }
 .btn.ghost { background: transparent; }
 .btn.small { padding: 4px 9px; min-height: 30px; font-size: 13px; }
 .btn.danger { color: var(--danger); }
-.link { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; }
+.link { background: none; border: 0; padding: 0; color: var(--accent-text); cursor: pointer; text-decoration: underline; }
 
 /* Timer */
 .timer-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -112,9 +127,16 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
-body[data-timer="running"] .timer-display { color: var(--accent); }
-body[data-timer="paused"] .timer-display { color: var(--warn); }
-.timer-status { color: var(--muted); font-size: 13.5px; margin-top: 4px; }
+.timer-card { position: relative; overflow: hidden; }
+.timer-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 5px; background: var(--line); }
+body[data-timer="running"] .timer-card::before { background: var(--running); }
+body[data-timer="paused"] .timer-card::before { background: var(--paused); }
+.timer-status {
+  display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; color: var(--muted); background: var(--accent-soft);
+}
+body[data-timer="running"] .timer-status { background: var(--running); color: var(--soft-black); }
+body[data-timer="paused"] .timer-status { background: var(--paused); color: var(--soft-black); }
 .timer-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
 .timer-buttons .btn { min-width: 84px; min-height: 42px; }
 .timer-fields { display: grid; grid-template-columns: 1fr 220px; gap: 12px; margin-top: 18px; }
@@ -161,9 +183,9 @@ dialog {
   border: 1px solid var(--line); border-radius: 14px;
   background: var(--card); color: var(--text);
   padding: 22px; width: min(560px, calc(100vw - 32px));
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+  box-shadow: 0 20px 60px rgba(25, 23, 28, .3);
 }
-dialog::backdrop { background: rgba(10, 16, 15, .45); }
+dialog::backdrop { background: rgba(25, 23, 28, .5); }
 dialog form { display: grid; gap: 12px; }
 .dlg-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
 .hint { margin: 0; color: var(--muted); font-size: 13px; }
@@ -171,7 +193,7 @@ dialog form { display: grid; gap: 12px; }
 .radio { display: flex; align-items: center; gap: 8px; }
 .list-items { display: grid; gap: 8px; max-height: 46vh; overflow: auto; padding: 2px; }
 .list-item { display: flex; gap: 8px; align-items: center; }
-.list-item input[type="color"] { flex: none; width: 38px; height: 38px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); }
+.list-item input[type="color"] { flex: none; width: 38px; height: 38px; padding: 2px; border: 1px solid var(--field-line); border-radius: 8px; background: var(--field); }
 .add-row { flex-wrap: nowrap; padding-top: 10px; border-top: 1px solid var(--line); }
 
 .toast {
